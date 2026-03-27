@@ -15,7 +15,11 @@ export const getProfile = async (req, res) => {
         lineUserId: user.line_user_id,
         displayName: user.display_name,
         pictureUrl: user.picture_url,
-        phoneNumber: user.phone_number || null
+        phoneNumber: user.phone_number || null,
+        firstName: user.first_name || null,
+        lastName: user.last_name || null,
+        address: user.address || null,
+        registered: user.registered || false
       },
       points: balance
     });
@@ -87,6 +91,55 @@ export const redeemReward = async (req, res) => {
   } catch (error) {
     console.error('Redeem reward error:', error);
     res.status(400).json({ error: error.message });
+  }
+};
+
+export const registerUser = async (req, res) => {
+  try {
+    const { firstName, lastName, address, phoneNumber } = req.body;
+    
+    if (!firstName || !firstName.trim()) {
+      return res.status(400).json({ error: 'กรุณากรอกชื่อ' });
+    }
+    if (!lastName || !lastName.trim()) {
+      return res.status(400).json({ error: 'กรุณากรอกนามสกุล' });
+    }
+    if (!phoneNumber) {
+      return res.status(400).json({ error: 'กรุณากรอกเบอร์โทรศัพท์' });
+    }
+    
+    const normalized = phoneNumber.replace(/[^0-9]/g, '');
+    if (!/^0\d{8,9}$/.test(normalized)) {
+      return res.status(400).json({ error: 'รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง (เช่น 0812345678)' });
+    }
+    
+    const existing = await User.findByPhoneNumber(normalized);
+    if (existing && existing.line_user_id !== req.user.line_user_id) {
+      return res.status(409).json({ error: 'เบอร์โทรนี้ถูกใช้งานแล้ว' });
+    }
+    
+    const updatedUser = await User.register(req.user.line_user_id, {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      address: address ? address.trim() : null,
+      phoneNumber: normalized
+    });
+    
+    res.json({
+      success: true,
+      message: 'ลงทะเบียนสำเร็จ',
+      user: {
+        userId: updatedUser.user_id,
+        firstName: updatedUser.first_name,
+        lastName: updatedUser.last_name,
+        address: updatedUser.address,
+        phoneNumber: updatedUser.phone_number,
+        registered: updatedUser.registered
+      }
+    });
+  } catch (error) {
+    console.error('Register user error:', error);
+    res.status(500).json({ error: 'ไม่สามารถลงทะเบียนได้' });
   }
 };
 

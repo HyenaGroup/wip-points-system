@@ -5,6 +5,7 @@ import RewardsPage from './pages/RewardsPage';
 import HistoryPage from './pages/HistoryPage';
 import RedemptionsPage from './pages/RedemptionsPage';
 import LinkPhonePage from './pages/LinkPhonePage';
+import RegisterPage from './pages/RegisterPage';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/redemptions" element={<RedemptionsPage />} />
           <Route path="/link-phone" element={<LinkPhonePage />} />
+          <Route path="/register" element={<RegisterPage />} />
         </Routes>
       </Router>
     </LiffProvider>

@@ -57,6 +57,22 @@ export const User = {
     return result.rows[0];
   },
 
+  async register(lineUserId, { firstName, lastName, address, phoneNumber }) {
+    const result = await query(
+      `UPDATE users 
+       SET first_name = $2,
+           last_name = $3,
+           address = $4,
+           phone_number = $5,
+           registered = true,
+           updated_at = CURRENT_TIMESTAMP
+       WHERE line_user_id = $1
+       RETURNING *`,
+      [lineUserId, firstName, lastName, address, phoneNumber]
+    );
+    return result.rows[0];
+  },
+
   async updateProfile(lineUserId, updates) {
     const { displayName, pictureUrl, email } = updates;
     const result = await query(

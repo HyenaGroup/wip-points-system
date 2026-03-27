@@ -9,6 +9,10 @@ const migrations = [
     picture_url TEXT,
     email VARCHAR(255),
     phone_number VARCHAR(20),
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    address TEXT,
+    registered BOOLEAN DEFAULT FALSE,
     authorized_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -105,6 +109,18 @@ const migrations = [
   `,
   `
   ALTER TABLE sales_records ADD COLUMN IF NOT EXISTS customer_name VARCHAR(255);
+  `,
+  `
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS first_name VARCHAR(255);
+  `,
+  `
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS last_name VARCHAR(255);
+  `,
+  `
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS address TEXT;
+  `,
+  `
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS registered BOOLEAN DEFAULT FALSE;
   `
 ];
 

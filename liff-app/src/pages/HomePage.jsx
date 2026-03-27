@@ -29,7 +29,17 @@ const HomePage = () => {
     fetchData();
   }, [isReady, accessToken]);
 
+  useEffect(() => {
+    if (!loading && userData && !userData.user?.registered) {
+      navigate('/register');
+    }
+  }, [loading, userData, navigate]);
+
   if (!isReady || loading) {
+    return <Loading />;
+  }
+
+  if (!userData?.user?.registered) {
     return <Loading />;
   }
 
@@ -46,7 +56,7 @@ const HomePage = () => {
               />
             )}
             <div>
-              <h2 className="text-xl font-bold">สวัสดี, {userData?.user?.displayName || 'คุณลูกค้า'}</h2>
+              <h2 className="text-xl font-bold">สวัสดี, {userData?.user?.firstName || userData?.user?.displayName || 'คุณลูกค้า'}</h2>
               <p className="text-sm opacity-90">ยินดีต้อนรับสู่ระบบสะสมแต้ม</p>
             </div>
           </div>

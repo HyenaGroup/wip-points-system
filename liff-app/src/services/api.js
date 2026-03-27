@@ -52,6 +52,12 @@ export const redeemReward = async (accessToken, rewardId) => {
   return response.data;
 };
 
+export const registerUser = async (accessToken, { firstName, lastName, address, phoneNumber }) => {
+  const api = createApiClient(accessToken);
+  const response = await api.post('/user/register', { firstName, lastName, address, phoneNumber });
+  return response.data;
+};
+
 export const updatePhoneNumber = async (accessToken, phoneNumber) => {
   const api = createApiClient(accessToken);
   const response = await api.put('/user/phone', { phoneNumber });

@@ -8,7 +8,8 @@ import {
   getRewards,
   redeemReward,
   getRedemptions,
-  updatePhone
+  updatePhone,
+  registerUser
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -16,6 +17,7 @@ const router = express.Router();
 router.use(verifyLineToken);
 
 router.get('/profile', getProfile);
+router.post('/register', registerUser);
 router.put('/phone', updatePhone);
 router.get('/points', getPoints);
 router.get('/points/history', getPointsHistory);
