@@ -37,6 +37,26 @@ export const User = {
     return user;
   },
 
+  async updatePhoneNumber(lineUserId, phoneNumber) {
+    const result = await query(
+      `UPDATE users 
+       SET phone_number = $2,
+           updated_at = CURRENT_TIMESTAMP
+       WHERE line_user_id = $1
+       RETURNING *`,
+      [lineUserId, phoneNumber]
+    );
+    return result.rows[0];
+  },
+
+  async findByPhoneNumber(phoneNumber) {
+    const result = await query(
+      'SELECT * FROM users WHERE phone_number = $1',
+      [phoneNumber]
+    );
+    return result.rows[0];
+  },
+
   async updateProfile(lineUserId, updates) {
     const { displayName, pictureUrl, email } = updates;
     const result = await query(

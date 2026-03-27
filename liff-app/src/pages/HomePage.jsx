@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLiff } from '../contexts/LiffContext';
 import { getProfile } from '../services/api';
 import Layout from '../components/Layout';
 import Loading from '../components/Loading';
-import { Star, TrendingUp, Gift } from 'lucide-react';
+import { Star, TrendingUp, Gift, Phone } from 'lucide-react';
 
 const HomePage = () => {
+  const navigate = useNavigate();
   const { isReady, profile, accessToken } = useLiff();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -62,6 +64,22 @@ const HomePage = () => {
             </div>
           </div>
         </div>
+
+        {!userData?.user?.phoneNumber && (
+          <button
+            onClick={() => navigate('/link-phone')}
+            className="w-full bg-amber-50 border-2 border-amber-300 rounded-xl p-4 mb-6 flex items-center shadow-sm hover:bg-amber-100 transition-colors"
+          >
+            <div className="bg-amber-400 rounded-full p-2 mr-3 flex-shrink-0">
+              <Phone size={20} className="text-white" />
+            </div>
+            <div className="text-left flex-1">
+              <p className="font-bold text-amber-800 text-sm">ยังไม่ได้ผูกเบอร์โทร</p>
+              <p className="text-xs text-amber-600">กดที่นี่เพื่อผูกเบอร์และรับแต้มสะสม</p>
+            </div>
+            <span className="text-amber-400 text-xl">›</span>
+          </button>
+        )}
 
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-white rounded-xl p-4 shadow">

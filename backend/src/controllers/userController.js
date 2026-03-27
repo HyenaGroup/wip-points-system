@@ -2,6 +2,7 @@ import { Points } from '../models/Points.js';
 import { Reward } from '../models/Reward.js';
 import { Redemption } from '../models/Redemption.js';
 import { Sales } from '../models/Sales.js';
+import { User } from '../models/User.js';
 
 export const getProfile = async (req, res) => {
   try {
@@ -13,7 +14,8 @@ export const getProfile = async (req, res) => {
         userId: user.user_id,
         lineUserId: user.line_user_id,
         displayName: user.display_name,
-        pictureUrl: user.picture_url
+        pictureUrl: user.picture_url,
+        phoneNumber: user.phone_number || null
       },
       points: balance
     });
@@ -85,6 +87,37 @@ export const redeemReward = async (req, res) => {
   } catch (error) {
     console.error('Redeem reward error:', error);
     res.status(400).json({ error: error.message });
+  }
+};
+
+export const updatePhone = async (req, res) => {
+  try {
+    const { phoneNumber } = req.body;
+    
+    if (!phoneNumber) {
+      return res.status(400).json({ error: 'กรุณาระบุเบอร์โทรศัพท์' });
+    }
+    
+    const normalized = phoneNumber.replace(/[^0-9]/g, '');
+    if (!/^0\d{8,9}$/.test(normalized)) {
+      return res.status(400).json({ error: 'รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง (เช่น 0812345678)' });
+    }
+    
+    const existing = await User.findByPhoneNumber(normalized);
+    if (existing && existing.line_user_id !== req.user.line_user_id) {
+      return res.status(409).json({ error: 'เบอร์โทรนี้ถูกใช้งานแล้ว' });
+    }
+    
+    const updatedUser = await User.updatePhoneNumber(req.user.line_user_id, normalized);
+    
+    res.json({
+      success: true,
+      message: 'ผูกเบอร์โทรศัพท์สำเร็จ',
+      phoneNumber: updatedUser.phone_number
+    });
+  } catch (error) {
+    console.error('Update phone error:', error);
+    res.status(500).json({ error: 'ไม่สามารถบันทึกเบอร์โทรศัพท์ได้' });
   }
 };
 

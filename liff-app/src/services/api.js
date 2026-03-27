@@ -52,6 +52,12 @@ export const redeemReward = async (accessToken, rewardId) => {
   return response.data;
 };
 
+export const updatePhoneNumber = async (accessToken, phoneNumber) => {
+  const api = createApiClient(accessToken);
+  const response = await api.put('/user/phone', { phoneNumber });
+  return response.data;
+};
+
 export const getRedemptions = async (accessToken, limit = 50) => {
   const api = createApiClient(accessToken);
   const response = await api.get('/user/redemptions', {
