@@ -20,7 +20,8 @@ export const LiffProvider = ({ children }) => {
   useEffect(() => {
     const initLiff = async () => {
       try {
-        await liff.init({ liffId: import.meta.env.VITE_LIFF_ID });
+        const liffId = import.meta.env.VITE_LIFF_ID || '2009617940-AYcFsrXX';
+        await liff.init({ liffId });
         
         if (!liff.isLoggedIn()) {
           liff.login();
