@@ -8,6 +8,7 @@ const migrations = [
     display_name VARCHAR(255),
     picture_url TEXT,
     email VARCHAR(255),
+    phone_number VARCHAR(20),
     authorized_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -38,6 +39,8 @@ const migrations = [
     record_id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(user_id) ON DELETE SET NULL,
     line_user_id VARCHAR(255),
+    phone_number VARCHAR(20),
+    customer_name VARCHAR(255),
     sale_date DATE NOT NULL,
     amount DECIMAL(10, 2) NOT NULL,
     points_earned INTEGER,
@@ -87,6 +90,21 @@ const migrations = [
   `,
   `
   CREATE INDEX IF NOT EXISTS idx_redemptions_user_id ON redemptions(user_id);
+  `,
+  `
+  CREATE INDEX IF NOT EXISTS idx_users_phone_number ON users(phone_number);
+  `,
+  `
+  CREATE INDEX IF NOT EXISTS idx_sales_records_phone_number ON sales_records(phone_number);
+  `,
+  `
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS phone_number VARCHAR(20);
+  `,
+  `
+  ALTER TABLE sales_records ADD COLUMN IF NOT EXISTS phone_number VARCHAR(20);
+  `,
+  `
+  ALTER TABLE sales_records ADD COLUMN IF NOT EXISTS customer_name VARCHAR(255);
   `
 ];
 

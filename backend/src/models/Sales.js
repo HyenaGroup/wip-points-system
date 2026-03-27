@@ -3,18 +3,20 @@ import { query } from '../config/database.js';
 export const Sales = {
   async createBulk(salesData, batchId) {
     const values = salesData.map((sale, index) => 
-      `($${index * 4 + 1}, $${index * 4 + 2}, $${index * 4 + 3}, $${index * 4 + 4})`
+      `($${index * 6 + 1}, $${index * 6 + 2}, $${index * 6 + 3}, $${index * 6 + 4}, $${index * 6 + 5}, $${index * 6 + 6})`
     ).join(',');
     
     const params = salesData.flatMap(sale => [
-      sale.lineUserId,
+      sale.lineUserId || null,
+      sale.phoneNumber || null,
+      sale.customerName || null,
       sale.saleDate,
       sale.amount,
       batchId
     ]);
     
     const result = await query(
-      `INSERT INTO sales_records (line_user_id, sale_date, amount, upload_batch_id)
+      `INSERT INTO sales_records (line_user_id, phone_number, customer_name, sale_date, amount, upload_batch_id)
        VALUES ${values}
        RETURNING *`,
       params
@@ -25,9 +27,11 @@ export const Sales = {
 
   async getPendingRecords() {
     const result = await query(
-      `SELECT sr.*, u.user_id 
+      `SELECT sr.*, 
+              COALESCE(u1.user_id, u2.user_id) as user_id
        FROM sales_records sr
-       LEFT JOIN users u ON sr.line_user_id = u.line_user_id
+       LEFT JOIN users u1 ON sr.line_user_id = u1.line_user_id AND sr.line_user_id IS NOT NULL AND sr.line_user_id != ''
+       LEFT JOIN users u2 ON sr.phone_number = u2.phone_number AND sr.phone_number IS NOT NULL AND sr.phone_number != ''
        WHERE sr.processed = false 
        AND sr.sale_date < CURRENT_DATE
        ORDER BY sr.sale_date ASC`

@@ -35,38 +35,59 @@ export const processCSVFile = async (filePath) => {
   });
 };
 
+function normalizePhone(phone) {
+  if (!phone) return '';
+  let p = String(phone).replace(/[^0-9]/g, '');
+  if (p.startsWith('66') && p.length === 11) p = '0' + p.slice(2);
+  if (p.length === 9 && !p.startsWith('0')) p = '0' + p;
+  return p;
+}
+
 function parseSalesData(rawData) {
   const salesData = [];
   const errors = [];
   
   rawData.forEach((row, index) => {
     try {
+      const phoneNumber = normalizePhone(
+        row.phone_number || row.phoneNumber || row.phone || row.Phone || 
+        row.PHONE_NUMBER || row.เบอร์โทร || row.เบอร์โทรศัพท์ || row.มือถือ || ''
+      );
       const lineUserId = String(row.line_user_id || row.lineUserId || row.LINE_USER_ID || '').trim();
-      const amount = parseFloat(row.amount || row.Amount || row.AMOUNT || 0);
-      const saleDate = parseDateField(row.sale_date || row.saleDate || row.date || row.Date || row.SALE_DATE);
+      const customerName = String(
+        row.customer_name || row.customerName || row.name || row.Name || 
+        row.CUSTOMER_NAME || row.ชื่อลูกค้า || row.ชื่อ || ''
+      ).trim();
+      const amount = parseFloat(row.amount || row.Amount || row.AMOUNT || row.ยอดขาย || row.จำนวนเงิน || 0);
+      const saleDate = parseDateField(
+        row.sale_date || row.saleDate || row.date || row.Date || 
+        row.SALE_DATE || row.วันที่ || row.วันที่ขาย
+      );
       
-      if (!lineUserId) {
-        errors.push({ row: index + 1, error: 'Missing LINE User ID' });
+      if (!phoneNumber && !lineUserId) {
+        errors.push({ row: index + 2, error: 'ต้องมีเบอร์โทรศัพท์หรือ LINE User ID' });
         return;
       }
       
       if (!amount || amount <= 0) {
-        errors.push({ row: index + 1, error: 'Invalid amount' });
+        errors.push({ row: index + 2, error: 'ยอดขายไม่ถูกต้อง' });
         return;
       }
       
       if (!saleDate) {
-        errors.push({ row: index + 1, error: 'Invalid date format' });
+        errors.push({ row: index + 2, error: 'รูปแบบวันที่ไม่ถูกต้อง' });
         return;
       }
       
       salesData.push({
+        phoneNumber,
         lineUserId,
+        customerName,
         amount,
         saleDate
       });
     } catch (error) {
-      errors.push({ row: index + 1, error: error.message });
+      errors.push({ row: index + 2, error: error.message });
     }
   });
   
