@@ -13,6 +13,7 @@ const migrations = [
     last_name VARCHAR(255),
     address TEXT,
     registered BOOLEAN DEFAULT FALSE,
+    pdpa_consent_at TIMESTAMP,
     authorized_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -121,6 +122,9 @@ const migrations = [
   `,
   `
   ALTER TABLE users ADD COLUMN IF NOT EXISTS registered BOOLEAN DEFAULT FALSE;
+  `,
+  `
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS pdpa_consent_at TIMESTAMP;
   `
 ];
 

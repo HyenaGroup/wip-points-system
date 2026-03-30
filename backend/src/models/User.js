@@ -65,6 +65,7 @@ export const User = {
            address = $4,
            phone_number = $5,
            registered = true,
+           pdpa_consent_at = CURRENT_TIMESTAMP,
            updated_at = CURRENT_TIMESTAMP
        WHERE line_user_id = $1
        RETURNING *`,

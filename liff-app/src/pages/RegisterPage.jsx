@@ -14,6 +14,7 @@ const RegisterPage = () => {
     address: '',
     phoneNumber: ''
   });
+  const [consentAccepted, setConsentAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
@@ -39,6 +40,11 @@ const RegisterPage = () => {
     }
     if (!form.phoneNumber) {
       setError('กรุณากรอกเบอร์โทรศัพท์');
+      setLoading(false);
+      return;
+    }
+    if (!consentAccepted) {
+      setError('กรุณายอมรับนโยบายความเป็นส่วนตัว');
       setLoading(false);
       return;
     }
@@ -171,6 +177,26 @@ const RegisterPage = () => {
             </div>
           </div>
 
+          {/* PDPA Consent */}
+          <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
+            <label className="flex items-start cursor-pointer">
+              <input
+                type="checkbox"
+                checked={consentAccepted}
+                onChange={(e) => setConsentAccepted(e.target.checked)}
+                className="mt-1 mr-3 w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary flex-shrink-0"
+              />
+              <div className="text-sm text-gray-700 leading-relaxed">
+                <span className="font-semibold text-gray-800">ฉันยอมรับ</span>
+                <span className="text-blue-600 font-medium"> นโยบายความเป็นส่วนตัว (PDPA)</span>
+                <p className="mt-2 text-xs text-gray-600">
+                  ข้าพเจ้ายินยอมให้เก็บรวบรวม ใช้ และเปิดเผยข้อมูลส่วนบุคคล (ชื่อ-นามสกุล, เบอร์โทรศัพท์, ที่อยู่, ประวัติการซื้อ) 
+                  เพื่อวัตถุประสงค์ในการสะสมแต้ม แลกของรางวัล และรับข้อมูลโปรโมชั่น
+                </p>
+              </div>
+            </label>
+          </div>
+
           {/* Error */}
           {error && (
             <div className="bg-red-50 rounded-xl p-4 flex items-start">
@@ -182,7 +208,7 @@ const RegisterPage = () => {
           {/* Submit */}
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !consentAccepted}
             className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 px-4 rounded-xl shadow-lg disabled:opacity-50 text-lg"
           >
             {loading ? 'กำลังลงทะเบียน...' : 'ลงทะเบียน'}
