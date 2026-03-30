@@ -122,6 +122,7 @@ const DashboardPage = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">วันที่</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">เบอร์โทร</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">LINE User ID</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">ยอดขาย</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">แต้มที่ได้</th>
@@ -135,7 +136,10 @@ const DashboardPage = () => {
                     {new Date(sale.sale_date).toLocaleDateString('th-TH')}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600 font-mono">
-                    {sale.line_user_id}
+                    {sale.phone_number || '-'}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600 font-mono">
+                    {sale.line_user_id || '-'}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-800 text-right font-semibold">
                     ฿{parseFloat(sale.amount).toLocaleString('th-TH', { minimumFractionDigits: 2 })}

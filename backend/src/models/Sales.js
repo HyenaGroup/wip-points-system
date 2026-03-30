@@ -32,8 +32,7 @@ export const Sales = {
        FROM sales_records sr
        LEFT JOIN users u1 ON sr.line_user_id = u1.line_user_id AND sr.line_user_id IS NOT NULL AND sr.line_user_id != ''
        LEFT JOIN users u2 ON sr.phone_number = u2.phone_number AND sr.phone_number IS NOT NULL AND sr.phone_number != ''
-       WHERE sr.processed = false 
-       AND sr.sale_date < CURRENT_DATE
+       WHERE sr.processed = false
        ORDER BY sr.sale_date ASC`
     );
     return result.rows;
