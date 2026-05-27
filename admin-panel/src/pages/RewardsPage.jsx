@@ -193,26 +193,41 @@ const RewardsPage = () => {
         {rewards.map((reward) => (
           <div
             key={reward.reward_id}
-            className={`bg-white rounded-lg shadow p-6 ${
+            className={`bg-white rounded-lg shadow overflow-hidden ${
               !reward.active ? 'opacity-60' : ''
             }`}
           >
-            <div className="flex items-start justify-between mb-4">
-              <Gift size={32} className="text-blue-600" />
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  reward.active
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-gray-100 text-gray-800'
-                }`}
-              >
-                {reward.active ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
-              </span>
-            </div>
+            {reward.image_url && (
+              <div className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
+                <img
+                  src={reward.image_url}
+                  alt={reward.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.parentElement.innerHTML = '<div class="flex items-center justify-center w-full h-full"><svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>';
+                  }}
+                />
+              </div>
+            )}
+            
+            <div className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                {!reward.image_url && <Gift size={32} className="text-blue-600" />}
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    reward.active
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}
+                >
+                  {reward.active ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
+                </span>
+              </div>
 
-            <h3 className="text-lg font-bold text-gray-800 mb-2">
-              {reward.name}
-            </h3>
+              <h3 className="text-lg font-bold text-gray-800 mb-2">
+                {reward.name}
+              </h3>
             
             {reward.description && (
               <p className="text-sm text-gray-600 mb-4">
@@ -220,39 +235,40 @@ const RewardsPage = () => {
               </p>
             )}
 
-            <div className="space-y-2 mb-4">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">แต้มที่ต้องใช้:</span>
-                <span className="font-bold text-blue-600">
-                  {reward.points_required.toLocaleString()} แต้ม
-                </span>
+              <div className="space-y-2 mb-4">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">แต้มที่ต้องใช้:</span>
+                  <span className="font-bold text-blue-600">
+                    {reward.points_required.toLocaleString()} แต้ม
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">คงเหลือ:</span>
+                  <span className="font-bold text-gray-800">
+                    {reward.stock.toLocaleString()}
+                  </span>
+                </div>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">คงเหลือ:</span>
-                <span className="font-bold text-gray-800">
-                  {reward.stock.toLocaleString()}
-                </span>
-              </div>
-            </div>
 
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleEdit(reward)}
-                className="flex-1 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
-              >
-                <Edit size={16} className="mr-1" />
-                แก้ไข
-              </button>
-              <button
-                onClick={() => handleToggleActive(reward)}
-                className={`flex-1 px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                  reward.active
-                    ? 'bg-gray-200 hover:bg-gray-300 text-gray-800'
-                    : 'bg-green-600 hover:bg-green-700 text-white'
-                }`}
-              >
-                {reward.active ? 'ปิดใช้งาน' : 'เปิดใช้งาน'}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleEdit(reward)}
+                  className="flex-1 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                >
+                  <Edit size={16} className="mr-1" />
+                  แก้ไข
+                </button>
+                <button
+                  onClick={() => handleToggleActive(reward)}
+                  className={`flex-1 px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                    reward.active
+                      ? 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                      : 'bg-green-600 hover:bg-green-700 text-white'
+                  }`}
+                >
+                  {reward.active ? 'ปิดใช้งาน' : 'เปิดใช้งาน'}
+                </button>
+              </div>
             </div>
           </div>
         ))}
