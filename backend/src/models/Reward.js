@@ -47,6 +47,14 @@ export const Reward = {
     return result.rows[0];
   },
 
+  async delete(rewardId) {
+    const result = await query(
+      'DELETE FROM rewards WHERE reward_id = $1 RETURNING *',
+      [rewardId]
+    );
+    return result.rows[0];
+  },
+
   async decrementStock(rewardId) {
     const result = await query(
       `UPDATE rewards 

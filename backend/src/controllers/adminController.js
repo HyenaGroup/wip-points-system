@@ -184,6 +184,23 @@ export const updateReward = async (req, res) => {
   }
 };
 
+export const deleteReward = async (req, res) => {
+  try {
+    const { rewardId } = req.params;
+    
+    const reward = await Reward.delete(rewardId);
+    
+    if (!reward) {
+      return res.status(404).json({ error: 'Reward not found' });
+    }
+    
+    res.json({ message: 'Reward deleted successfully', reward });
+  } catch (error) {
+    console.error('Delete reward error:', error);
+    res.status(500).json({ error: 'Failed to delete reward' });
+  }
+};
+
 export const getRedemptions = async (req, res) => {
   try {
     const { status } = req.query;

@@ -9,6 +9,7 @@ import {
   getRewards,
   createReward,
   updateReward,
+  deleteReward,
   getRedemptions,
   updateRedemptionStatus
 } from '../controllers/adminController.js';
@@ -25,6 +26,7 @@ router.get('/sales', getSalesRecords);
 router.get('/rewards', getRewards);
 router.post('/rewards', createReward);
 router.put('/rewards/:rewardId', updateReward);
+router.delete('/rewards/:rewardId', deleteReward);
 router.get('/redemptions', getRedemptions);
 router.put('/redemptions/:redemptionId', updateRedemptionStatus);
 

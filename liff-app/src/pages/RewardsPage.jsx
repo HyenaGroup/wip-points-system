@@ -132,16 +132,12 @@ const RewardsPage = () => {
                         {reward.description}
                       </p>
                       
-                      <div className="flex items-center justify-between mt-3">
+                      <div className="flex items-center mt-3">
                         <div className="flex items-center text-primary">
                           <Star size={16} className="mr-1" />
                           <span className="font-bold">{reward.points_required.toLocaleString()}</span>
                           <span className="text-sm ml-1">แต้ม</span>
                         </div>
-                        
-                        <span className="text-sm text-gray-500">
-                          คงเหลือ: {reward.stock}
-                        </span>
                       </div>
 
                       {reward.stock === 0 ? (

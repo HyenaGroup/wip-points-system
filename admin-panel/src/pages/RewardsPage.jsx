@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { getRewards, createReward, updateReward } from '../services/api';
-import { Gift, Plus, Edit, Save, X } from 'lucide-react';
+import { getRewards, createReward, updateReward, deleteReward } from '../services/api';
+import { Gift, Plus, Edit, Save, X, Trash2 } from 'lucide-react';
 
 const RewardsPage = () => {
   const { token } = useAuth();
@@ -84,6 +84,19 @@ const RewardsPage = () => {
       fetchRewards();
     } catch (error) {
       console.error('Error toggling reward:', error);
+    }
+  };
+
+  const handleDelete = async (reward) => {
+    if (!confirm(`ต้องการลบ "${reward.name}" ใช่หรือไม่? การลบจะไม่สามารถกู้คืนได้`)) {
+      return;
+    }
+    try {
+      await deleteReward(token, reward.reward_id);
+      fetchRewards();
+    } catch (error) {
+      console.error('Error deleting reward:', error);
+      alert('เกิดข้อผิดพลาดในการลบ');
     }
   };
 
@@ -267,6 +280,12 @@ const RewardsPage = () => {
                   }`}
                 >
                   {reward.active ? 'ปิดใช้งาน' : 'เปิดใช้งาน'}
+                </button>
+                <button
+                  onClick={() => handleDelete(reward)}
+                  className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition-colors"
+                >
+                  <Trash2 size={16} />
                 </button>
               </div>
             </div>

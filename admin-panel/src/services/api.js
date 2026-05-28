@@ -65,6 +65,12 @@ export const updateReward = async (token, rewardId, updates) => {
   return response.data;
 };
 
+export const deleteReward = async (token, rewardId) => {
+  const api = createApiClient(token);
+  const response = await api.delete(`/admin/rewards/${rewardId}`);
+  return response.data;
+};
+
 export const getRedemptions = async (token, status = null) => {
   const api = createApiClient(token);
   const response = await api.get('/admin/redemptions', {
