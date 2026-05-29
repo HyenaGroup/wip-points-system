@@ -35,15 +35,11 @@ const RewardsPage = () => {
 
   const handleRedeem = async (reward) => {
     if (points.available_points < reward.points_required) {
-      liff.openWindow({
-        url: 'https://line.me',
-        external: false
-      });
       return;
     }
 
     const confirmed = window.confirm(
-      `ต้องการแลก "${reward.name}" ใช้ ${reward.points_required} แต้มใช่หรือไม่?`
+      `ต้องการแลก "${reward.name}" ใช้ ${reward.points_required.toLocaleString()} แต้มใช่หรือไม่?`
     );
 
     if (!confirmed) return;
@@ -52,16 +48,17 @@ const RewardsPage = () => {
     try {
       const result = await redeemReward(accessToken, reward.reward_id);
       
-      liff.openWindow({
-        url: 'https://line.me',
-        external: false
-      });
+      alert(`แลกของรางวัลสำเร็จ!\n\nรหัสการแลก: ${result.redemptionCode || '-'}\nของรางวัล: ${reward.name}\nแต้มที่ใช้: ${reward.points_required.toLocaleString()} แต้ม`);
 
-      const updatedPoints = await getPoints(accessToken);
+      const [updatedPoints, updatedRewards] = await Promise.all([
+        getPoints(accessToken),
+        getRewards(accessToken)
+      ]);
       setPoints(updatedPoints);
+      setRewards(updatedRewards);
     } catch (error) {
       console.error('Error redeeming reward:', error);
-      alert('เกิดข้อผิดพลาดในการแลกของรางวัล: ' + error.message);
+      alert('เกิดข้อผิดพลาดในการแลกของรางวัล: ' + (error.response?.data?.error || error.message));
     } finally {
       setRedeeming(false);
     }

@@ -106,14 +106,16 @@ export const Redemption = {
 
   async getAll(status = null, limit = 100) {
     const sql = status
-      ? `SELECT r.*, rw.name as reward_name, u.display_name, u.line_user_id
+      ? `SELECT r.*, rw.name as reward_name, u.display_name, u.line_user_id,
+                u.phone_number, u.first_name, u.last_name, u.address
          FROM redemptions r
          LEFT JOIN rewards rw ON r.reward_id = rw.reward_id
          LEFT JOIN users u ON r.user_id = u.user_id
          WHERE r.status = $1
          ORDER BY r.redeemed_at DESC
          LIMIT $2`
-      : `SELECT r.*, rw.name as reward_name, u.display_name, u.line_user_id
+      : `SELECT r.*, rw.name as reward_name, u.display_name, u.line_user_id,
+                u.phone_number, u.first_name, u.last_name, u.address
          FROM redemptions r
          LEFT JOIN rewards rw ON r.reward_id = rw.reward_id
          LEFT JOIN users u ON r.user_id = u.user_id

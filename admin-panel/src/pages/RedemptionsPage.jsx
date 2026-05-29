@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { getRedemptions, updateRedemptionStatus } from '../services/api';
-import { Award, Clock, CheckCircle, XCircle, Package } from 'lucide-react';
+import { Award, Clock, CheckCircle, XCircle, Package, Phone, MapPin } from 'lucide-react';
 
 const RedemptionsPage = () => {
   const { token } = useAuth();
@@ -128,10 +128,29 @@ const RedemptionsPage = () => {
                     {redemption.reward_name}
                   </h3>
                   <p className="text-sm text-gray-600 mt-1">
-                    {redemption.display_name} ({redemption.line_user_id})
+                    {redemption.first_name && redemption.last_name
+                      ? `${redemption.first_name} ${redemption.last_name}`
+                      : redemption.display_name || '-'}
+                    {redemption.display_name && redemption.first_name && (
+                      <span className="text-gray-400 ml-1">(LINE: {redemption.display_name})</span>
+                    )}
                   </p>
                 </div>
                 {getStatusBadge(redemption.status)}
+              </div>
+
+              <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 mb-4">
+                <p className="text-xs font-semibold text-blue-700 mb-2">ข้อมูลสำหรับจัดส่ง</p>
+                <div className="space-y-1">
+                  <div className="flex items-center text-sm text-gray-800">
+                    <Phone size={14} className="mr-2 text-blue-500 flex-shrink-0" />
+                    <span className="font-semibold">{redemption.phone_number || 'ไม่มีเบอร์โทร'}</span>
+                  </div>
+                  <div className="flex items-start text-sm text-gray-800">
+                    <MapPin size={14} className="mr-2 mt-0.5 text-blue-500 flex-shrink-0" />
+                    <span>{redemption.address || 'ไม่มีที่อยู่'}</span>
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
