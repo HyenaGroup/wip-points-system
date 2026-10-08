@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ['nodejs_18', 'postgresql']
+nixPkgs = ['nodejs_20', 'postgresql']
 
 [phases.install]
 cmds = ['npm ci']
@@ -8,4 +8,4 @@ cmds = ['npm ci']
 cmds = ['npm run build:railway']
 
 [start]
-cmd = 'npm run railway:migrate && npm start'
+cmd = 'npm start'

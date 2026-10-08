@@ -8,4 +8,4 @@ cmds = ['cd backend && npm ci']
 cmds = ['cd backend && npm run build || echo "No build step"']
 
 [start]
-cmd = 'cd backend && npm run railway:migrate && npm start'
+cmd = 'cd backend && npm start'
