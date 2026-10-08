@@ -9,19 +9,25 @@ export function formatSlipResult(result) {
 }
 export async function handleSlipEvent(event, request = fetch, env = process.env) {
   const allowed = (env.SLIPOK_TEST_USER_IDS || '').split(',').map(s => s.trim()).filter(Boolean);
-  if (env.SLIPOK_ENABLED !== 'true' || event.type !== 'message' || event.message?.type !== 'image' || event.source?.type !== 'user' || !allowed.includes(event.source.userId)) return;
-  if (!env.SLIPOK_API_KEY || !env.SLIPOK_BRANCH_ID || !env.LINE_CHANNEL_ACCESS_TOKEN || !event.replyToken) return;
+  if (event.type !== 'message' || event.message?.type !== 'image') return;
+  if (env.SLIPOK_ENABLED !== 'true') { console.log('[SlipOK] skipped: SLIPOK_ENABLED must be true'); return; }
+  if (event.source?.type !== 'user') { console.log('[SlipOK] skipped: only one-to-one chats supported'); return; }
+  if (!allowed.includes(event.source.userId)) { console.log('[SlipOK] skipped: sender not in SLIPOK_TEST_USER_IDS; configured count:', allowed.length); return; }
+  const missing = ['SLIPOK_API_KEY', 'SLIPOK_BRANCH_ID', 'LINE_CHANNEL_ACCESS_TOKEN'].filter(key => !env[key]);
+  if (missing.length || !event.replyToken) { console.log('[SlipOK] skipped: missing configuration', missing.join(','), 'reply token present:', Boolean(event.replyToken)); return; }
+  console.log('[SlipOK] processing image');
   // Demo deduplication is per process, for 24 hours. Use durable storage for production.
   const now = Date.now();
   for (const [key, expiry] of seen) if (expiry <= now) seen.delete(key);
   const id = event.webhookEventId || event.message.id;
-  if (seen.has(id)) return;
+  if (seen.has(id)) { console.log('[SlipOK] skipped: duplicate webhook event'); return; }
   seen.set(id, now + 86400000);
   let text;
   try {
     const image = await request('https://api-data.line.me/v2/bot/message/' + encodeURIComponent(event.message.id) + '/content', {
       headers:{Authorization:'Bearer ' + env.LINE_CHANNEL_ACCESS_TOKEN}, signal:AbortSignal.timeout(10000)
     });
+    console.log('[SlipOK] LINE image HTTP status:', image.status);
     if (!image.ok) throw new Error('Download failed');
     const bytes = await image.arrayBuffer();
     if (bytes.byteLength > 10485760) throw new Error('Image too large');
@@ -35,11 +41,13 @@ export async function handleSlipEvent(event, request = fetch, env = process.env)
       method:'POST', headers:{'x-authorization':env.SLIPOK_API_KEY}, body:form, signal:AbortSignal.timeout(20000)
     });
     const result = await response.json();
+    console.log('[SlipOK] check HTTP status:', response.status, 'code:', Number(result.code) || 0, 'success:', result.success === true);
     text = formatSlipResult(response.ok ? result : {code:result.code});
-  } catch { text = 'ยังตรวจสอบสลิปไม่สำเร็จในขณะนี้ กรุณาติดต่อร้านก่อนยืนยันการชำระเงิน'; }
+  } catch { console.error('[SlipOK] image download or verification failed'); text = 'ยังตรวจสอบสลิปไม่สำเร็จในขณะนี้ กรุณาติดต่อร้านก่อนยืนยันการชำระเงิน'; }
   const reply = await request('https://api.line.me/v2/bot/message/reply', {
     method:'POST', headers:{Authorization:'Bearer ' + env.LINE_CHANNEL_ACCESS_TOKEN,'Content-Type':'application/json'},
     body:JSON.stringify({replyToken:event.replyToken,messages:[{type:'text',text}]}), signal:AbortSignal.timeout(10000)
   });
+  console.log('[SlipOK] LINE reply HTTP status:', reply.status);
   if (!reply.ok) throw new Error('LINE reply failed');
 }

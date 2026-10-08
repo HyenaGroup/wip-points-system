@@ -11,7 +11,11 @@ export function validateSignature(body, signature) {
   return expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
 }
 router.post('/webhook', (req, res) => {
-  if (!validateSignature(req.rawBody, req.headers['x-line-signature'])) return res.status(401).json({error:'Invalid signature'});
+  if (!validateSignature(req.rawBody, req.headers['x-line-signature'])) {
+    console.warn('[LINE webhook] rejected: invalid signature; check LINE_CHANNEL_SECRET');
+    return res.status(401).json({error:'Invalid signature'});
+  }
+  console.log('[LINE webhook] accepted; event count:', (req.body.events || []).length);
   res.status(200).json({success:true});
   for (const event of req.body.events || []) handleSlipEvent(event).catch(() => console.error('Slip verification or LINE reply failed'));
 });
