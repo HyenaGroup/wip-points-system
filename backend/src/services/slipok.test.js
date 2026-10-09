@@ -50,3 +50,17 @@ test('upstream timeout produces a failure reply', async () => {
   },env);
   assert.match(reply.messages[0].text,/ยังตรวจสอบสลิปไม่สำเร็จ/);
 });
+
+test('non-slip images are silent while slip and configuration errors still reply', async () => {
+  const env = {SLIPOK_ENABLED:'true',SLIPOK_API_KEY:'test',SLIPOK_BRANCH_ID:'123',LINE_CHANNEL_ACCESS_TOKEN:'test'};
+  for (const code of [1007, '1008', 1002, 1006, 1011, 1012, 1014]) {
+    let replies = 0;
+    await handleSlipEvent({type:'message',webhookEventId:'image-code-' + code,source:{type:'user',userId:'customer'},message:{type:'image',id:'image'},replyToken:'reply'}, async (url) => {
+      if (url.includes('api-data')) return new Response(new Uint8Array([1,2]), {headers:{'content-type':'image/png'}});
+      if (url.includes('api.slipok')) return Response.json({success:false,code}, {status:400});
+      replies++;
+      return Response.json({});
+    }, env);
+    assert.equal(replies, [1007,1008].includes(Number(code)) ? 0 : 1);
+  }
+});

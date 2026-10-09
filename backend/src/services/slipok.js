@@ -40,6 +40,11 @@ export async function handleSlipEvent(event, request = fetch, env = process.env)
     });
     const result = await response.json();
     console.log('[SlipOK] check HTTP status:', response.status, 'code:', Number(result.code) || 0, 'success:', result.success === true);
+    // No payment QR: leave product enquiries for the shop to answer.
+    if ([1007, 1008].includes(Number(result.code))) {
+      console.log('[SlipOK] ignored: no payment verification QR');
+      return;
+    }
     text = formatSlipResult(response.ok ? result : {code:result.code});
   } catch { console.error('[SlipOK] image download or verification failed'); text = 'ยังตรวจสอบสลิปไม่สำเร็จในขณะนี้ กรุณาติดต่อร้านก่อนยืนยันการชำระเงิน'; }
   const reply = await request('https://api.line.me/v2/bot/message/reply', {
