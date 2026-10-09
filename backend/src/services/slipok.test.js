@@ -12,9 +12,9 @@ test('signature uses exact bytes', () => {
   assert.equal(validateSignature(Buffer.from('{"events":[]}'), sig), false);
   assert.equal(validateSignature(raw, 'invalid'), false);
 });
-test('gating, multipart upload, reply and duplicate prevention', async () => {
+test('all customers can upload regardless of old allowlist; disabled and group events are ignored', async () => {
   const env = {SLIPOK_ENABLED:'true',SLIPOK_TEST_USER_IDS:'Utest',SLIPOK_API_KEY:'test',SLIPOK_BRANCH_ID:'123',LINE_CHANNEL_ACCESS_TOKEN:'test'};
-  const event = {type:'message',webhookEventId:'test-event',source:{type:'user',userId:'Utest'},message:{type:'image',id:'1'},replyToken:'reply'};
+  const event = {type:'message',webhookEventId:'test-event',source:{type:'user',userId:'Ucustomer'},message:{type:'image',id:'1'},replyToken:'reply'};
   const calls = [];
   const request = async (url, options) => {
     calls.push({url,options});
@@ -27,12 +27,14 @@ test('gating, multipart upload, reply and duplicate prevention', async () => {
     return Response.json({});
   };
   await handleSlipEvent(event,request,{...env,SLIPOK_ENABLED:'false'});
-  await handleSlipEvent(event,request,{...env,SLIPOK_TEST_USER_IDS:''});
+  await handleSlipEvent({...event,source:{type:'group',groupId:'group'}},request,env);
   assert.equal(calls.length,0);
   await handleSlipEvent(event,request,env);
   await handleSlipEvent(event,request,env);
   assert.equal(calls.length,3);
   assert.match(JSON.parse(calls[2].options.body).messages[0].text,/100.00/);
+  await handleSlipEvent({...event,webhookEventId:'no-allowlist'},request,{...env,SLIPOK_TEST_USER_IDS:''});
+  assert.equal(calls.length,6);
 });
 test('invalid results cannot be treated as success', () => {
   assert.match(formatSlipResult({success:true,data:{success:false,amount:100,transRef:'ref'}}),/❌/);

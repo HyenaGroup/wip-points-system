@@ -8,11 +8,9 @@ export function formatSlipResult(result) {
   return '❌ ' + (messages[result?.code] || 'ยังตรวจสอบสลิปไม่สำเร็จ กรุณาติดต่อร้าน');
 }
 export async function handleSlipEvent(event, request = fetch, env = process.env) {
-  const allowed = (env.SLIPOK_TEST_USER_IDS || '').split(',').map(s => s.trim()).filter(Boolean);
   if (event.type !== 'message' || event.message?.type !== 'image') return;
   if (env.SLIPOK_ENABLED !== 'true') { console.log('[SlipOK] skipped: SLIPOK_ENABLED must be true'); return; }
   if (event.source?.type !== 'user') { console.log('[SlipOK] skipped: only one-to-one chats supported'); return; }
-  if (!allowed.includes(event.source.userId)) { console.log('[SlipOK] skipped: sender not in SLIPOK_TEST_USER_IDS; configured count:', allowed.length); return; }
   const missing = ['SLIPOK_API_KEY', 'SLIPOK_BRANCH_ID', 'LINE_CHANNEL_ACCESS_TOKEN'].filter(key => !env[key]);
   if (missing.length || !event.replyToken) { console.log('[SlipOK] skipped: missing configuration', missing.join(','), 'reply token present:', Boolean(event.replyToken)); return; }
   console.log('[SlipOK] processing image');
